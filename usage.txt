@@ -1,0 +1,63 @@
+# GRCOLOR
+
+## Synopsis
+
+grcolor is a program capable of coloring graphs with many different coloring methods, both sequential and parallel.
+
+During execution, it provides the user useful informations about what's going on in terms of which graph is being colored, which method is being used, the total time spent coloring, the number of colors used, and whether the coloring is valid or not.
+It is also possible to export the results, allowing for a later analysis to be conducted.
+
+
+## Technical requirements
+
+The program is meant to be compiled and executed in a POSIX-compliant environment, as it makes use of many POSIX libraries.
+While testing the program, WSL (Windows Subsystem for Linux) can be used, but for performance reasons we recommend running benchmarks on a native Linux installation (nb: the program should work correctly on macOS too but it has not been tested).
+
+gcc is also required to compile the program.
+
+Our benchmarks have been run on a machine equipped with a i7-6700k processor (4cores / 8threads) and 16gb of RAM, running a native Ubuntu 20.04.2 LTS installation.
+
+
+## Program directory structure
+
+The program directory is organized as follows:
+
+- the top level directory contains the executable generated at compile time;
+- the 'src/' subfolder contains the source files (.h and .c) and a makefile;
+- the 'graphs/' subfolder contains graphs' files (.gra or .graph) meant to be colored when no graph is specified as argument;
+- the 'results/' subfolder contains the .csv files generated during execution if the '--csv' flag is specified. It also includes a Python script 'analyzer.py' that uses those results to generate useful charts in the 'plots/' subfolder (nb: if you wish to run the Python script, make sure you have installed the required modules, if necessary you can run 'pip install -r requirements.txt').
+
+
+## Compiling and running the program
+
+To compile the program, the user can simply navigate to the 'src/' subfolder and run 'make' in a terminal.
+The compiled executable will be generated in the top level directory.
+
+To execute the program, the user can simply run './grcolor.exe' in a terminal.
+Executing the program without parameters will result in the program using the default configuration to color the graphs found in the 'graphs/' subfolder.
+We included a subset of the provided graphs consisting of the smaller graphs (to avoid increasing the project's folder size unnecessarily).
+
+There are a few parameters that can be specified when running the program, some usage examples are:
+
+./grcolor.exe --threads 4 --csv
+this will color every graph in the 'graphs/' subfolder using all the different coloring methods, with 4 threads for parallel methods, and then export the results to csv.
+
+./grcolor.exe --par <graph_path1> <graph_path2> ...
+this will color only the specified graphs given their paths, either absolute or relative (nb: in this scenario, it's not necessary for a graph file to be in the `graphs/` subfolder), using only parallel coloring methods (notice the '--par' flag).
+
+./grcolor.exe -t 8 -n 10
+this will color every graph in the 'graphs/' subfolder using all the different coloring methods, 10 times, with 8 threads for parallel methods.
+
+
+## Manual
+
+Usage: ./grcolor.exe [OPTION]... [GRAPH_PATH]...
+Colors the GRAPH_PATHs if specified, else colors the graphs found in the 'graphs/' subfolder, according to the OPTIONs.
+
+OPTIONs are:
+--par               use parallel coloring methods only
+--csv               export results to csv
+-t, --threads <n>   use n threads for parallel coloring methods, with n > 0 (nb: n will be lowered if it is higher than the available logical processors in the system)
+-n <n>              for each graph, for each coloring method, do n iterations, with n > 0
+
+The order of parameters doesn't matter, a string that isn't a flag will be considered as a graph's filepath
